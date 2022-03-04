@@ -12,15 +12,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
-app.post("/urls", (req, res) => {
-  console.log(req.body);// Log the POST request body to the console
-    const randomString = generateRandomString(6) 
-    urlDatabase[generateRandomString()] = req.body.longURL
-  console.log(randomString)
-
-
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
-});
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
@@ -52,9 +43,13 @@ charactersLength));
  }
  return result;
 }
-app.post("/urls", (req, res) => {
-  console.log(req.body);
-  urlDatabase[generateRandomString()] = req.body.longURL;
-  res.send('Ok');
-})
 
+app.post("/urls", (req, res) => {
+  console.log(req.body);// Log the POST request body to the console
+  const newURL = generateRandomString(6);
+  urlDatabase[newURL] = req.body.longURL;
+    
+  console.log(urlDatabase)
+  res.redirect(`/urls/${newURL}`)
+    //res.send("Ok");         // Respond with 'Ok' (we will replace this)
+});
