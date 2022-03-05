@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser')
 
 
 const urlDatabase = {
@@ -34,6 +35,7 @@ app.get("/hello", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+app.use(cookieParser());
 function generateRandomString(length) {
   let result  = '';
   const characters  = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -66,4 +68,8 @@ app.post("/urls/:shortURL/", (req, res) => {
   urlDatabase[shortURL] = req.body.longURL
   res.redirect(`/urls`)
 })
-
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  res.cookie('username', username);
+  res.redirect('/urls');
+});
