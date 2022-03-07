@@ -12,8 +12,16 @@
       </div>
       
     </div>
+    <% if(true){ %>
+      <h1><%= username %></h1>
+    <% } else{ %>  
+      <h1>bar</h1>
+   <% } %>
+    <p> <%= username %> </p>
     <form method="post" action="/login">
+    
       <p>
+        
         <label>Username:</label>
         <input type="text" name="username">
         <input type="submit" value="Login">
