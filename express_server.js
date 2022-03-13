@@ -3,8 +3,11 @@ const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session')
 const { set } = require("express/lib/application");
-
+const bcrypt = require('bcryptjs');
+//const password = "purple-monkey-dinosaur"; // found in the req.params object
+//const hashedPassword = bcrypt.hashSync(password, 10);
 const users = { 
   "userRandomID": {
     id: "userRandomID", 
@@ -52,11 +55,17 @@ const cookieMatch = function (cookie, userDatabase) {
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
+//app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ["key"],
 
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 app.get("/urls/new", (req, res) => {
   const templateVars = { 
-    user: users[req.cookies["user_id"]]
+    user: users[req.session["user_id"]]
   };
   res.render("urls_new", templateVars);
   
@@ -65,7 +74,7 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL
-  const currUserID = req.cookies["user_id"];
+  const currUserID = req.session["user_id"];
   const currUser = users[currUserID]
   const templateVars = { 
     shortURL: req.params.shortURL, 
@@ -85,19 +94,17 @@ app.get("/hello", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const currUserID = req.cookies["user_id"];
+  const currUserID = req.session["user_id"];
   const currUser = users[currUserID]
   const templateVars = {urls: urlsForUser(currUserID), user: currUser};
   res.render("urls_index", templateVars);
 });
 app.get("/register", (req, res) => {
-  //const currUserID = req.cookies["user_id"];
-  //const currUser = currUser(currUserID, users)
   const templateVars = {urls: urlDatabase, user: null};
   res.render("urls_register", templateVars);
 });
 app.get("/login", (req, res) => {
-  const currUserID = req.cookies["user_id"];
+  const currUserID = req.session["user_id"];
   //const currUser = currUser(currUserID, users)
   const currUser = users[currUserID]
   const templateVars = {urls: urlDatabase, user: currUser};
@@ -114,7 +121,7 @@ res.status(404).send("site doesnt exist")
 app.post("/urls", (req, res) => {
   //console.log(req.body);// Log the POST request body to the console
   //const newURL = generateRandomString(6);
-  const currUserID = req.cookies["user_id"]
+  const currUserID = req.session["user_id"]
   if(currUserID){
     const newURL = generateRandomString(6);
     urlDatabase[newURL] = {longURL: req.body.longURL, userID: currUserID} ;
@@ -126,7 +133,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  const currUserID = req.cookies["user_id"];
+  const currUserID = req.session["user_id"];
   const { shortURL} = req.params
   const url = urlDatabase[shortURL]
   if(!url){
@@ -142,7 +149,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 app.post("/urls/:shortURL/", (req, res) => {
   const { shortURL} = req.params
-  const currUserID = req.cookies["user_id"];
+  const currUserID = req.session["user_id"];
   const url = urlDatabase[shortURL]
   if(!url){
     return res.status(404).send('this url doesnt exist')
@@ -159,10 +166,11 @@ app.post("/login", (req, res) => {
   const userName = req.body.email;
   const password = req.body.password
   let userFound = null
-  //console.log("this is pretest", users)
+  
   for(userID in users ){
     let currUser = users[userID] 
-    if(userName === currUser.email && password === currUser.password){
+    if(userName === currUser.email && bcrypt.compareSync(password, currUser.password))
+    {
       userFound = currUser
       break
     }  
@@ -173,22 +181,21 @@ app.post("/login", (req, res) => {
     }
   console.log("this is the username", userName, userID);
   //console.log("this is the userfound", userFound)
-  res.cookie(`user_id`, userID);
+  req.session["user_id"] = userID;
   res.redirect(`/urls`);
   
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id')
+  req.session = null
   res.redirect(`/urls`)
 })
 
 app.post("/register", (req, res) => {
-  //req.cookies["username"]
   const userID = generateRandomString(6)
   const email = req.body.email
   const password = req.body.password
-  
+  const hashedPassword = bcrypt.hashSync(password, 10)
 
   if(!email || !password) return res.status(400).send('Email or password can not be empty')
   
@@ -199,12 +206,12 @@ app.post("/register", (req, res) => {
   if(findEmail) {
     return res.status(400).send('email already exists')  }
   
-  res.cookie('user_id', userID);
+    req.session["user_id"] = userID;
     
   const user = {
     id: userID,
     email: email,
-    password: password
+    password: hashedPassword
   }
   
   users[userID] = user
