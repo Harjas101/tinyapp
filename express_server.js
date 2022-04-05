@@ -21,6 +21,9 @@ app.use(
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   })
 );
+
+      //ALL GET REQUESTS BELOW  
+
 //this is for new urls
 app.get("/urls/new", (req, res) => {
   const templateVars = {
@@ -72,6 +75,10 @@ app.get("/u/:shortURL", (req, res) => {
   }
   res.status(404).send("site doesnt exist");
 });
+
+
+  //ALL POST REQUESTS BELOW
+
 
 app.post("/urls", (req, res) => {
   const currUserID = req.session["user_id"];
@@ -171,8 +178,6 @@ app.post("/register", (req, res) => {
   users[userID] = user;
   res.redirect(`/urls`);
 });
-
-
 
 
 app.listen(PORT, () => {
