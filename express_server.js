@@ -6,6 +6,7 @@ var cookieSession = require("cookie-session");
 const { set } = require("express/lib/application");
 const bcrypt = require("bcryptjs");
 const getUserByEmail = require("./helpers.js")
+const urlsForUser = require("./helpers.js")
 
 const users = {
   userRandomID: {
@@ -28,16 +29,6 @@ const urlDatabase = {
     longURL: "https://www.google.ca",
     userID: "aJ48lW",
   }
-};
-//this function brings up the urls for the current user logged in
-const urlsForUser = function (id) {
-  const userUrls = {};
-  for (const shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].userID === id) {
-      userUrls[shortURL] = urlDatabase[shortURL];
-    }
-  }
-  return userUrls;
 };
 
 app.set("view engine", "ejs");
