@@ -7,7 +7,7 @@ const { set } = require("express/lib/application");
 const bcrypt = require("bcryptjs");
 const getUserByEmail = require("./helpers.js")
 const urlsForUser = require("./helpers.js")
-
+const generateRandomString = require("./helpers.js")
 
 
 app.set("view engine", "ejs");
@@ -172,17 +172,9 @@ app.post("/register", (req, res) => {
   res.redirect(`/urls`);
 });
 
+
+
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-function generateRandomString(length) {
-  let result = "";
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const charactersLength = characters.length;
-  for (var i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
