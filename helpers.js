@@ -9,6 +9,9 @@ const getUserByEmail = function(email, users) {
   return false;
 };
 
+const urlDatabase = {
+  userID: "aJ48lW",
+}
 
 //this function brings up the urls for the current user logged in
 const urlsForUser = function (id) {
@@ -31,5 +34,19 @@ function generateRandomString(length) {
   }
   return result;
 }
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
 
-module.exports =  {getUserByEmail, urlsForUser, generateRandomString} 
+  
+
+module.exports =  {getUserByEmail, urlsForUser, generateRandomString, urlDatabase, users}

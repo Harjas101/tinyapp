@@ -5,9 +5,11 @@ const bodyParser = require("body-parser");
 let cookieSession = require("cookie-session");
 const { set } = require("express/lib/application");
 const bcrypt = require("bcryptjs");
-const getUserByEmail = require("./helpers.js")
-const urlsForUser = require("./helpers.js")
-const generateRandomString = require("./helpers.js")
+const {getUserByEmail} = require("./helpers.js")
+const {urlsForUser} = require("./helpers.js")
+const {generateRandomString} = require("./helpers.js")
+const {urlDatabase} = require("./helpers.js")
+const {users} = require("./helpers.js")
 
 
 app.set("view engine", "ejs");
@@ -57,7 +59,11 @@ app.get("/urls", (req, res) => {
   const currUserID = req.session["user_id"];
   const currUser = users[currUserID];
   const templateVars = { urls: urlsForUser(currUserID), user: currUser };
+  if (!currUserID){
+    res.redirect('/register');
+  } else {
   res.render("urls_index", templateVars);
+  }
 });
 app.get("/register", (req, res) => {
   const templateVars = { urls: urlDatabase, user: null };
