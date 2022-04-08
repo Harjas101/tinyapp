@@ -28,6 +28,11 @@ app.use(
 
 //this is for new urls
 app.get("/urls/new", (req, res) => {
+  const currUserID = req.session["user_id"];
+  if (!currUserID){
+    return res.send(` <p>You must login or register to use the application</p>
+    <p><a href='/login'>Login</a> &nbsp; | <a href='/register'>Register</a></p>`)
+  }
   const templateVars = {
     user: users[req.session["user_id"]],
   };
@@ -35,8 +40,13 @@ app.get("/urls/new", (req, res) => {
 });
 //endpoint for short urls
 app.get("/urls/:shortURL", (req, res) => {
-  const shortURL = req.params.shortURL;
   const currUserID = req.session["user_id"];
+  if (!currUserID){
+    return res.send(` <p>You must login or register to use the application</p>
+    <p><a href='/login'>Login</a> &nbsp; | <a href='/register'>Register</a></p>`)
+  }
+  const shortURL = req.params.shortURL;
+  //const currUserID = req.session["user_id"];
   const currUser = users[currUserID];
   const templateVars = {
     shortURL: req.params.shortURL,
@@ -46,6 +56,11 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 app.get("/", (req, res) => {
+  const currUserID = req.session["user_id"];
+  if (!currUserID){
+    return res.send(` <p>You must login or register to use the application</p>
+    <p><a href='/login'>Login</a> &nbsp; | <a href='/register'>Register</a></p>`)
+  }
   res.redirect("/urls");
 });
 app.get("/urls.json", (req, res) => {
@@ -57,6 +72,11 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const currUserID = req.session["user_id"];
+
+  if (!currUserID){
+    return res.send(` <p>You must login or register to use the application</p>
+    <p><a href='/login'>Login</a> &nbsp; | <a href='/register'>Register</a></p>`)
+  }
   const currUser = users[currUserID];
   const templateVars = { urls: urlsForUser(currUserID), user: currUser };
   if (!currUserID){
@@ -66,16 +86,27 @@ app.get("/urls", (req, res) => {
   }
 });
 app.get("/register", (req, res) => {
+  const currUserID = req.session["user_id"];
+  if (currUserID){
+    return res.redirect("/urls")
+  }
   const templateVars = { urls: urlDatabase, user: null };
   res.render("urls_register", templateVars);
 });
 app.get("/login", (req, res) => {
   const currUserID = req.session["user_id"];
+  if (currUserID){
+    return res.redirect("/urls")
+  }
   const currUser = users[currUserID];
   const templateVars = { urls: urlDatabase, user: currUser };
   res.render("urls_login", templateVars);
 });
 app.get("/u/:shortURL", (req, res) => {
+  if (!currUserID){
+    return res.send(` <p>You must login or register to use the application</p>
+    <p><a href='/login'>Login</a> &nbsp; | <a href='/register'>Register</a></p>`)
+  }
   if (urlDatabase[req.params.shortURL]) {
     return res.redirect(urlDatabase[req.params.shortURL].longURL);
   }
