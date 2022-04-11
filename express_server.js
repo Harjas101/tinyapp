@@ -103,6 +103,7 @@ app.get("/login", (req, res) => {
   res.render("urls_login", templateVars);
 });
 app.get("/u/:shortURL", (req, res) => {
+  const currUserID = req.session["user_id"];
   if (!currUserID){
     return res.send(` <p>You must login or register to use the application</p>
     <p><a href='/login'>Login</a> &nbsp; | <a href='/register'>Register</a></p>`)
