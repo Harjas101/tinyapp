@@ -95,6 +95,7 @@ app.get("/register", (req, res) => {
 });
 app.get("/login", (req, res) => {
   const currUserID = req.session["user_id"];
+  console.log("this is my currUserId", currUserID)
   if (currUserID){
     return res.redirect("/urls")
   }
@@ -103,11 +104,7 @@ app.get("/login", (req, res) => {
   res.render("urls_login", templateVars);
 });
 app.get("/u/:shortURL", (req, res) => {
-  const currUserID = req.session["user_id"];
-  if (!currUserID){
-    return res.send(` <p>You must login or register to use the application</p>
-    <p><a href='/login'>Login</a> &nbsp; | <a href='/register'>Register</a></p>`)
-  }
+ 
   if (urlDatabase[req.params.shortURL]) {
     return res.redirect(urlDatabase[req.params.shortURL].longURL);
   }
@@ -119,7 +116,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 
 app.post("/urls", (req, res) => {
-  const currUserID = req.session["user_id"];
+ const currUserID = req.session["user_id"];
   if (currUserID) {
     const newURL = generateRandomString(6);
     urlDatabase[newURL] = { longURL: req.body.longURL, userID: currUserID };
